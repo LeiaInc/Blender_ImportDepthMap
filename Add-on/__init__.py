@@ -15,16 +15,17 @@ import bpy
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 ##### --- Modification Header --- #############
+#
+# Update: 8 Jan 2025 (1.1.2)
+#  - renamed ImportDepthMap to LeiaImportDepthMap to avoid confusion with former project
+#  - updated for Blender 4.2
 # 
-# Date: 11 Oct 2023
+# Update: 11 Oct 2023 (1.1.1)
 # Author (of modifications only): Andreas Altmann
-# Name/Version: importdepthmap_1.1.1_LI1.zip (added suffix to the original version denoting Leia Inc change #1)
 # Description: This code is a modification of code developed originally by Elin. Modifications performed by Leia Inc. as noted using inline comments in code
 # A thank you to Elin who provided the bulk of this code
-#
 # Original code can be found here: https://github.com/Ladypoly/Serpens-Bledner-Addons/tree/main/Serpens3
 # Version used as base for the modifications: importdepthmap_1.1.1.zip
-#
 # Modifications Performed:
 #  - changed default subdivision modifier levels from 6 to 8 for standard depth maps, and from 3 to 5 for panoramas
 #  - changed color space for depth map from sRGB to Raw
@@ -34,11 +35,11 @@ import bpy
 ###############################################
 
 bl_info = {
-    "name" : "ImportDepthMap",
-    "author" : "Elin", 
+    "name" : "LeiaImportDepthMap",
+    "author" : "Elin / Andreas", 
     "description" : "",
-    "blender" : (3, 3, 0),
-    "version" : (1, 1, 1),
+    "blender" : (4, 2, 0),
+    "version" : (1, 1, 2),
     "location" : "Import",
     "warning" : "",
     "doc_url": "", 
@@ -75,9 +76,9 @@ def sna_materialsetup_AC51B():
     node_A7B06.location = (-300.0, 100.0)
     node_A7B06.image = nodetree['sna_image']
     material_F46A0.node_tree.nodes['Principled BSDF'].inputs['Roughness'].default_value = 0.9900000095367432
-    material_F46A0.node_tree.nodes['Principled BSDF'].inputs['Specular'].default_value = 0.009999999776482582
+    # material_F46A0.node_tree.nodes['Principled BSDF'].inputs['Specular'].default_value = 0.009999999776482582 # LI2 removed, not supported in Blender 4.2
     link_B8FF1 = material_F46A0.node_tree.links.new(input=material_F46A0.node_tree.nodes['Principled BSDF'].inputs[0], output=node_A7B06.outputs[0], )
-    link_F8C6B = material_F46A0.node_tree.links.new(input=material_F46A0.node_tree.nodes['Principled BSDF'].inputs['Emission'], output=node_A7B06.outputs[0], )
+    # link_F8C6B = material_F46A0.node_tree.links.new(input=material_F46A0.node_tree.nodes['Principled BSDF'].inputs['Emission'], output=node_A7B06.outputs[0], ) # LI2 removed, not supported in Blender 4.2
     if nodetree['sna_usesepimages']:
         pass
     else:
@@ -211,7 +212,7 @@ def sna_buildsetup_63DA1():
             bpy.context.view_layer.objects.active.hide_render = True
         bpy.ops.mesh.primitive_plane_add('INVOKE_DEFAULT', size=1.0)
         bpy.context.view_layer.objects.active.name = nodetree['sna_image'].name.split(',')[0]
-        bpy.ops.object.shade_smooth('INVOKE_DEFAULT', use_auto_smooth=True, auto_smooth_angle=math.radians(60.0))
+        # bpy.ops.object.shade_smooth('INVOKE_DEFAULT', use_auto_smooth=True, auto_smooth_angle=math.radians(60.0)) # LT2 removed, not supported in Blender 4.2 
         bpy.context.view_layer.objects.active.rotation_euler = (math.radians(90.0), 0.0, 0.0)
         bpy.context.view_layer.objects.active.location = (0.0, 0.0, 0.5)
         bpy.context.view_layer.objects.active.scale = (nodetree['sna_aspectratio'], 1.0, 1.0)
@@ -241,7 +242,7 @@ def sna_setdisplacesettings_E5830(Index, Strength):
     else:
         texture_F90B3.image = nodetree['sna_image']
         list(bpy.context.view_layer.objects.active.modifiers)[Index].texture.crop_min_x = 0.5
-    texture_F90B3.image.colorspace_settings.name = 'Raw' #LeiaInc LI1 modification: change from sRGB (default)_to Raw so that colorspace mapping does not skew depth map
+    texture_F90B3.image.colorspace_settings.name = 'Non-Color' # LI2 - changed from Raw to Non-Color, Raw not supported by Blender 4.2
 
 
 def leia_deformsettings(Index): #LeiaInc LI1 - Add Simple Deform Modifier
